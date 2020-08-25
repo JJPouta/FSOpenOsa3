@@ -34,8 +34,31 @@ const port = 3001
 app.listen(port)
 console.log(`Server running on port ${port}`)
 
+app.use(express.json()) 
+
+
+// Kaikki -> .json
 app.get("/api/persons",(req,res) => res.json(persons))
 
+
+// Yksittäisen kontaktin näyttäminen
+app.get("/api/persons/:id",(req,res) => 
+{
+    const contactID = parseInt(req.params.id);
+    
+    const found = persons.some(person => person.id === contactID)
+
+    if(found){
+        res.status(200).json(persons.filter(person => person.id === contactID))
+    }
+    else{
+        res.status(400).send("<h1 style='color: red'>ID not found</h1>")
+    }
+
+
+})
+
+// Statustiedot ja aikaleima
 app.get("/info",(req,res) => {
     
     let contactCount = persons.length;
@@ -49,3 +72,46 @@ app.get("/info",(req,res) => {
     
 })
 
+// Tietojen poisto
+app.delete("/api/persons/:id",(req,res) => {
+
+    const contactID = parseInt(req.params.id);
+
+    const found = persons.some(person => person.id === contactID)
+
+    if(found){
+        persons = persons.filter(person => person.id !== contactID)
+
+        res.status(204).end()
+    }
+    else{
+        res.status(400).send("<h1 style='color: red'>ID not found</h1>")
+    }
+
+})
+
+
+// Uuden tiedon lisääminen
+app.post("/api/persons",(req,res) => {
+
+    const newContact = {
+        "name": req.body.name,
+        "number": req.body.number,
+        "id": Math.floor(Math.random() * (10000 - 1) + 1)
+    }
+
+    const found = persons.some(person => person.name === newContact.name)
+
+    if(!newContact.name || !newContact.number){
+        return res.status(400).send("<h1 style='color: red'>ERROR: Name and number must contain data</h1>")
+    }
+    else if(found)
+    {
+        return res.status(409).send("<h1 style='color: red'>ERROR: Name must be unique</h1>")
+    }
+    else
+    {
+        persons.push(newContact)
+        return res.json(persons)
+    }
+})
