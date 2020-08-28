@@ -1,7 +1,7 @@
 const express = require("express")
-const { request, response } = require("express")
 const app = express()
 const moment = require("moment")
+const morgan = require("morgan")
 
 
 let persons = [
@@ -35,6 +35,12 @@ app.listen(port)
 console.log(`Server running on port ${port}`)
 
 app.use(express.json()) 
+app.use(morgan("tiny",{skip: function(req,res)
+    {
+        if(req.method === "POST"){
+            let data = JSON.stringify(res.req.body)
+            console.log(data)
+        }}}))
 
 
 // Kaikki -> .json
