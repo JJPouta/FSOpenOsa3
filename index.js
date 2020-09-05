@@ -2,7 +2,7 @@ const express = require("express")
 const app = express()
 const moment = require("moment")
 const morgan = require("morgan")
-
+const cors = require('cors')
 
 let persons = [
     {
@@ -30,10 +30,13 @@ let persons = [
 
 
 
-const port = 3001
-app.listen(port)
-console.log(`Server running on port ${port}`)
+const PORT = process.env.PORT || 3001
+app.listen(PORT)
+console.log(`Server running on PORT ${PORT}`)
 
+// Middlewaret
+app.use(express.static(__dirname + "/build"))
+app.use(cors())
 app.use(express.json()) 
 app.use(morgan("tiny",{skip: function(req,res)
     {
