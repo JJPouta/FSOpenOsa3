@@ -1,38 +1,16 @@
+require('dotenv').config()
 const express = require("express")
 const app = express()
 const moment = require("moment")
 const morgan = require("morgan")
 const cors = require('cors')
-
-let persons = [
-    {
-      "name": "Arto Hellas",
-      "number": "040-123456",
-      "id": 1
-    },
-    {
-      "name": "Ada Lovelace",
-      "number": "39-44-5323523",
-      "id": 2
-    },
-    {
-      "name": "Dan Abramov",
-      "number": "12-43-234345",
-      "id": 3
-    },
-    {
-      "name": "Mary Poppendieck",
-      "number": "39-23-6423122",
-      "id": 4
-    }
-  ]
+const Contact = require("./models/contact")
 
 
-
-
-const PORT = process.env.PORT || 3001
+const PORT = process.env.PORT
 app.listen(PORT)
 console.log(`Server running on PORT ${PORT}`)
+
 
 // Middlewaret
 app.use(express.static(__dirname + "/build"))
@@ -47,7 +25,12 @@ app.use(morgan("tiny",{skip: function(req,res)
 
 
 // Kaikki -> .json
-app.get("/api/persons",(req,res) => res.json(persons))
+app.get("/api/persons",(req,res) => 
+{
+    Contact.find({})
+    .then(contacts => {res.json(contacts)})
+}
+)
 
 
 // Yksittäisen kontaktin näyttäminen
