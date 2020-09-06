@@ -86,24 +86,38 @@ app.delete("/api/persons/:id",(req,res) => {
 // Uuden tiedon lisääminen
 app.post("/api/persons",(req,res) => {
 
-    const newContact = {
-        "name": req.body.name,
-        "number": req.body.number,
-        "id": Math.floor(Math.random() * (10000 - 1) + 1)
-    }
 
-    const found = persons.some(person => person.name === newContact.name)
+    const newContact = new Contact({
+        name: req.body.name,
+        number: req.body.number
+    })
 
-    if(!newContact.name || !newContact.number){
-        return res.status(400).send("<h1 style='color: red'>ERROR: Name and number must contain data</h1>")
-    }
-    else if(found)
-    {
-        return res.status(409).send("<h1 style='color: red'>ERROR: Name must be unique</h1>")
-    }
-    else
-    {
-        persons.push(newContact)
-        return res.json(persons)
-    }
+
+    newContact.save()
+    .then(savedContact => {
+    console.log(`added ${req.body.name} number ${req.body.number} to phonebook`)
+        res.json(savedContact)
+        
+    })
+
+    // const newContact = {
+    //     "name": req.body.name,
+    //     "number": req.body.number,
+    //     "id": Math.floor(Math.random() * (10000 - 1) + 1)
+    // }
+
+    // const found = persons.some(person => person.name === newContact.name)
+
+    // if(!newContact.name || !newContact.number){
+    //     return res.status(400).send("<h1 style='color: red'>ERROR: Name and number must contain data</h1>")
+    // }
+    // else if(found)
+    // {
+    //     return res.status(409).send("<h1 style='color: red'>ERROR: Name must be unique</h1>")
+    // }
+    // else
+    // {
+    //     persons.push(newContact)
+    //     return res.json(persons)
+    // }
 })

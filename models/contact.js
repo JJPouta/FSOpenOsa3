@@ -1,9 +1,11 @@
 const mongoose = require('mongoose');
 
-const connString = process.env.MONGO_URL
+const connString = process.env.MONGO_URL 
 
 console.log(connString)
 mongoose.connect(connString,{ useNewUrlParser: true, useUnifiedTopology: true })
+.then(result => console.log("Connected to Puhelinluettelo database"))
+.catch((error) => console.log(`Error connecting to Puhelinluettelo database:`,error.message))
 
 const contactSchema = new mongoose.Schema({
     name: String,
