@@ -35,54 +35,50 @@ app.get("/api/persons",(req,res,next) =>
 // Yksittäisen kontaktin näyttäminen
 app.get("/api/persons/:id",(req,res,next) => 
 {
-    const contactID = parseInt(req.params.id);
+    const contactID = req.params.id;
     
-    const found = persons.some(person => person.id === contactID)
+    Contact.findById(contactID)
+    .then(contact => {
+        
+        if(contact)
+        {
+            res.json(contact)
+        }
+        else
+        {
+            res.status(400).send(`<h1 style='color: red'>Unable to find ID ${contactID}</h1>`)
+        }
+        })
+    .catch(error => next(error))
 
-    if(found){
-        res.status(200).json(persons.filter(person => person.id === contactID))
-    }
-    else{
-        res.status(400).send("<h1 style='color: red'>ID not found</h1>")
-    }
-
-
+    
 })
 
 // Statustiedot ja aikaleima
 app.get("/info",(req,res,next) => {
     
-    let contactCount = persons.length;
-    let timeStamp = moment().format()
-    let weekday = moment().format("dddd")
+    // Mallien lkm
+    Contact.estimatedDocumentCount().then(cnt => {
 
-    res.send(`<div>
-        <p>Phonebook contains ${contactCount} contacts</p>
+        let timeStamp = moment().format()
+        let weekday = moment().format("dddd")
+
+        res.send(`<div>
+        <p>Phonebook contains ${cnt} contacts</p>
         <p>${weekday + " " + timeStamp}</p>
          </div>`)
+
+
+    }).catch(error => next(error))
     
 })
 
 // Tietojen poisto
 app.delete("/api/persons/:id",(req,res,next) => {
 
-    // const contactID = parseInt(req.params.id);
-    
-
     Contact.findByIdAndRemove(req.params.id)
     .then(result => res.status(204).end())
     .catch(error => next(error))
-
-    // const found = persons.some(person => person.id === contactID)
-
-    // if(found){
-    //     persons = persons.filter(person => person.id !== contactID)
-
-    //     res.status(204).end()
-    // }
-    // else{
-    //     res.status(400).send("<h1 style='color: red'>ID not found</h1>")
-    // }
 
 })
 
@@ -105,27 +101,20 @@ app.post("/api/persons",(req,res,next) => {
     })
     .catch(error => next(error))
 
-    // const newContact = {
-    //     "name": req.body.name,
-    //     "number": req.body.number,
-    //     "id": Math.floor(Math.random() * (10000 - 1) + 1)
-    // }
-
-    // const found = persons.some(person => person.name === newContact.name)
-
-    // if(!newContact.name || !newContact.number){
-    //     return res.status(400).send("<h1 style='color: red'>ERROR: Name and number must contain data</h1>")
-    // }
-    // else if(found)
-    // {
-    //     return res.status(409).send("<h1 style='color: red'>ERROR: Name must be unique</h1>")
-    // }
-    // else
-    // {
-    //     persons.push(newContact)
-    //     return res.json(persons)
-    // }
 })
+
+app.put("/api/persons/:id",(req,res,next) => {
+
+    const contact = {
+        number: req.body.number
+    }
+
+    Contact.findByIdAndUpdate(req.params.id,contact,{
+        new: true})
+    .then(updatedContact => res.json(updatedContact))
+    .catch(error => next(error))
+})
+
 
 const errorHandler = (error,req,res,next) => {
 
