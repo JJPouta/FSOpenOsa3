@@ -118,9 +118,18 @@ app.put("/api/persons/:id",(req,res,next) => {
 
 const errorHandler = (error,req,res,next) => {
 
-   res.status(500)
-   res.send(`<h1 style='color: red'>Following error has occured: ${error.message}</h1>`)
-   console.log(error.message)
+    if(error.name === 'ValidationError')
+    {
+        console.log(error.message)
+        return res.status(400).json({error: error.message})
+    }
+    else
+    {
+        res.status(500)
+        res.send(`<h1 style='color: red'>Following error has occured: ${error.message}</h1>`)
+    }
+   
+  
 }
 
 app.use(errorHandler)

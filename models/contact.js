@@ -1,4 +1,6 @@
 const mongoose = require('mongoose');
+const uniqueValidator = require('mongoose-unique-validator');
+mongoose.set('useCreateIndex', true);
 
 const connString = process.env.MONGO_URL 
 
@@ -8,8 +10,17 @@ mongoose.connect(connString,{ useNewUrlParser: true, useUnifiedTopology: true })
 .catch((error) => console.log(`Error connecting to Puhelinluettelo database:`,error.message))
 
 const contactSchema = new mongoose.Schema({
-    name: String,
-    number: String
+    name: {
+    type: String,
+    minlength: 3,
+    required: true,
+    unique: true
+    },
+    number: {
+      type: String,
+      minlength: 8,
+      required: true
+    }
   })
 
 
@@ -20,5 +31,7 @@ const contactSchema = new mongoose.Schema({
     delete returnedObject.__v
   }
 })
+
+contactSchema.plugin(uniqueValidator);
 
 module.exports = mongoose.model("Contact",contactSchema)
